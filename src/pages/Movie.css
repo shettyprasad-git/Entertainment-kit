@@ -1,0 +1,267 @@
+.movie-page {
+    background-color: #111;
+    min-height: 100vh;
+    color: white;
+    padding-left: 80px;
+    /* Sidebar width */
+    font-family: 'Outfit', sans-serif;
+}
+
+.movie-backdrop {
+    height: 80vh;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 50px;
+}
+
+.movie-content {
+    display: flex;
+    padding: 0 40px;
+    width: 100%;
+    gap: 40px;
+    z-index: 10;
+}
+
+.movie-poster-large {
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.movie-info-large {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.movie-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.movie-meta {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.movie-rating {
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.movie-genres {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.genre-tag {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.movie-overview-large {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.play-button {
+    background-color: #e50914;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.play-button:hover {
+    background-color: #f40612;
+    transform: scale(1.05);
+}
+
+/* Details Section */
+.movie-details-section {
+    padding: 40px;
+}
+
+.tabs {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 10px 0;
+    position: relative;
+    transition: color 0.2s;
+    font-family: inherit;
+}
+
+.tab-btn:hover,
+.tab-btn.active {
+    color: white;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #e50914;
+}
+
+.tab-content {
+    min-height: 300px;
+}
+
+/* Cast Grid */
+.cast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.cast-card {
+    text-align: center;
+}
+
+.cast-img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    object-fit: cover;
+    aspect-ratio: 2/3;
+}
+
+.cast-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.cast-character {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+/* Videos Grid */
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.video-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+.video-title {
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+/* Reviews List */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.review-author {
+    font-weight: bold;
+    color: #e50914;
+}
+
+.review-date {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.review-content {
+    line-height: 1.6;
+    color: #ddd;
+    margin-bottom: 15px;
+}
+
+.read-more {
+    color: #e50914;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+/* Similar Grid */
+.similar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.similar-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.similar-card:hover {
+    transform: scale(1.05);
+}
+
+.similar-poster {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.similar-title {
+    font-size: 0.9rem;
+    text-align: center;
+}
