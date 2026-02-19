@@ -32,11 +32,7 @@ function Login() {
         <div className="login-container">
             <div className="login-glass">
                 <div className="login-header">
-                    <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
-                        alt="Netflix Logo"
-                        className="login-logo"
-                    />
+                    <h1 style={{ color: '#e50914', marginBottom: '20px', fontWeight: 'bold' }}>Entertainment Kit</h1>
                     <h2>Sign In</h2>
                 </div>
 

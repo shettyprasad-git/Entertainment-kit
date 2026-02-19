@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Row from "../Row";
 import requests from "../requests";
 import Banner from "../Banner";
-import Nav from "../Nav";
+import Sidebar from "../components/Sidebar";
 import Footer from "../Footer";
 
 function Home() {

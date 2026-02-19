@@ -46,11 +46,7 @@ function Register() {
         <div className="register-container">
             <div className="register-glass">
                 <div className="register-header">
-                    <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
-                        alt="Netflix Logo"
-                        className="register-logo"
-                    />
+                    <h1 style={{ color: '#e50914', marginBottom: '20px', fontWeight: 'bold' }}>Entertainment Kit</h1>
                     <h2>Sign Up</h2>
                 </div>
 
