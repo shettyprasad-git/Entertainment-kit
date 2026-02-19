@@ -29,7 +29,7 @@ function Register() {
         }
 
         try {
-            await axios.post('http://localhost:5000/register', {
+            await axios.post('https://entertainment-kit-backend.vercel.app/register', {
                 username: formData.username,
                 name: formData.name,
                 password: formData.password,
