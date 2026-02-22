@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { Search, User, Tv, Film, Home, LogOut } from 'lucide-react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { Search, User, Tv, Film, Home, LogOut, Menu } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { useAuth, useUser } from '@/firebase';
 
@@ -27,8 +28,10 @@ const navLinks = [
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const typeParam = searchParams.get('type');
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,6 +39,9 @@ export function Header() {
     const query = formData.get('search') as string;
     if (query) {
       router.push(`/search?q=${encodeURIComponent(query)}`);
+      // Close sheet if it's open on mobile
+      const closeButton = document.getElementById('mobile-menu-close');
+      if (closeButton) closeButton.click();
     }
   };
 
@@ -43,34 +49,52 @@ export function Header() {
     await auth.signOut();
     router.push('/login');
   };
+  
+  const NavLink = ({ href, label }: { href: string, label: string }) => {
+    const isActive = (() => {
+      if (href.includes('?')) {
+        const linkParams = new URLSearchParams(href.split('?')[1]);
+        const linkType = linkParams.get('type');
+        return pathname === '/browse' && typeParam === linkType;
+      }
+      if (href === '/browse') {
+        return pathname === '/browse' && !typeParam;
+      }
+      return pathname === href;
+    })();
+
+    return (
+       <Link
+          href={href}
+          className={cn(
+            'transition-colors hover:text-foreground/80',
+            isActive ? 'text-foreground' : 'text-foreground/60'
+          )}
+        >
+          {label}
+        </Link>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 max-w-screen-2xl items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Logo className="h-6 w-6 text-primary" />
-          <span className="hidden font-bold sm:inline-block">Entertainment-Kit</span>
-        </Link>
-        <nav className="flex items-center gap-4 text-sm lg:gap-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                'transition-colors hover:text-foreground/80',
-                pathname === link.href ? 'text-foreground' : 'text-foreground/60'
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <form onSubmit={handleSearch} className="relative w-full max-w-xs">
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center space-x-2">
+            <Logo className="h-6 w-6 text-primary" />
+            <span className="hidden font-bold sm:inline-block">Entertainment-Kit</span>
+          </Link>
+          <nav className="hidden items-center gap-4 text-sm md:flex lg:gap-6">
+            {navLinks.map((link) => <NavLink key={link.href} {...link} />)}
+          </nav>
+        </div>
+        
+        <div className="flex items-center justify-end gap-2">
+          <form onSubmit={handleSearch} className="relative hidden w-full max-w-xs sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               name="search"
-              placeholder="Search movies & TV shows..."
+              placeholder="Search..."
               className="pl-9"
               aria-label="Search"
             />
@@ -98,10 +122,45 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="ghost" onClick={() => router.push('/login')}>
+            <Button variant="ghost" onClick={() => router.push('/login')} className="hidden sm:inline-flex">
               Login
             </Button>
           )}
+
+           <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+                <SheetClose id="mobile-menu-close" className="hidden" />
+                <div className="flex flex-col gap-8">
+                    <Link href="/" className="flex items-center space-x-2">
+                        <Logo className="h-6 w-6 text-primary" />
+                        <span className="font-bold">Entertainment-Kit</span>
+                    </Link>
+                    <form onSubmit={handleSearch} className="relative w-full">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          name="search"
+                          placeholder="Search..."
+                          className="pl-9"
+                          aria-label="Search"
+                        />
+                    </form>
+                    <nav className="flex flex-col gap-4 text-lg">
+                        {navLinks.map((link) => <NavLink key={link.href} {...link} />)}
+                    </nav>
+                     {!user && (
+                        <Button variant="outline" onClick={() => router.push('/login')}>
+                            Login
+                        </Button>
+                    )}
+                </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
