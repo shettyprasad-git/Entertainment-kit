@@ -10,7 +10,7 @@ export default function HomePage() {
     <div className="flex flex-col">
       <HeroSection media={featuredContent} />
       <div className="container mx-auto flex flex-col gap-12 px-4 py-8 sm:px-6 sm:gap-16 lg:px-8">
-        <MediaCarousel title="Trending Now" items={trending} />
+        <MediaCarousel title="Trending Today" items={trending} />
         <RecommendationSection />
         <MediaCarousel title="My Watchlist" items={watchlist.slice(0, 5)} />
         <MediaCarousel title="New Releases" items={newReleases} />
