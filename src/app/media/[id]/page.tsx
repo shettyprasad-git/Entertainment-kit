@@ -79,8 +79,10 @@ export default function MediaPage({ params }: MediaPageProps) {
             </div>
             <p className="max-w-prose text-lg text-muted-foreground">{media.description}</p>
             <div className="flex items-center gap-4">
-              <Button size="lg">
-                <Play className="mr-2 h-5 w-5 fill-current" /> Play
+              <Button size="lg" asChild>
+                <a href="#trailer">
+                  <Play className="mr-2 h-5 w-5 fill-current" /> Play
+                </a>
               </Button>
               <WatchlistButton mediaId={media.id} />
             </div>
@@ -115,7 +117,7 @@ export default function MediaPage({ params }: MediaPageProps) {
           )}
 
           {media.trailerUrl && (
-            <div>
+            <div id="trailer" className="scroll-mt-20">
               <h2 className="mb-6 text-3xl font-bold">Trailer</h2>
               <div className="aspect-video overflow-hidden rounded-lg">
                 <iframe
