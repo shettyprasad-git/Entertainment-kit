@@ -55,7 +55,7 @@ export function AuthForm() {
 
   return (
     <div className="flex items-center justify-center min-h-[80vh]">
-        <Card className="w-full max-w-md bg-card/50 backdrop-blur-lg">
+        <Card className="w-full max-w-md bg-card backdrop-blur-lg">
             <CardHeader>
                 <CardTitle>Welcome</CardTitle>
                 <CardDescription>Sign in or create an account to continue</CardDescription>

@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MediaCard } from '@/components/media-card';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { Card } from '@/components/ui/card';
 
 type BrowseClientProps = {
   allMedia: Media[];
@@ -81,41 +82,43 @@ export function BrowseClient({ allMedia, genres }: BrowseClientProps) {
 
   return (
     <>
-      <div className="mb-8 flex flex-col gap-6">
-        <h1 className="text-3xl font-bold tracking-tight">Browse</h1>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-                <Button variant={selectedType === 'all' ? 'secondary' : 'ghost'} onClick={() => handleTypeChange('all')}>All</Button>
-                <Button variant={selectedType === 'movie' ? 'secondary' : 'ghost'} onClick={() => handleTypeChange('movie')}>Movies</Button>
-                <Button variant={selectedType === 'tv' ? 'secondary' : 'ghost'} onClick={() => handleTypeChange('tv')}>TV Shows</Button>
-            </div>
-            <div className="flex items-center gap-4">
-            <Select value={selectedGenre} onValueChange={handleGenreChange}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Filter by genre" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value="all">All Genres</SelectItem>
-                {genres.map((genre) => (
-                    <SelectItem key={genre} value={genre}>
-                    {genre}
-                    </SelectItem>
-                ))}
-                </SelectContent>
-            </Select>
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value="rating-desc">Rating (High to Low)</SelectItem>
-                <SelectItem value="rating-asc">Rating (Low to High)</SelectItem>
-                <SelectItem value="year-desc">Year (Newest First)</SelectItem>
-                <SelectItem value="year-asc">Year (Oldest First)</SelectItem>
-                </SelectContent>
-            </Select>
-            </div>
-        </div>
+      <div className="mb-8">
+        <h1 className="mb-6 text-3xl font-bold tracking-tight">Browse</h1>
+        <Card className="bg-card p-4 backdrop-blur-lg">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                  <Button variant={selectedType === 'all' ? 'secondary' : 'ghost'} onClick={() => handleTypeChange('all')}>All</Button>
+                  <Button variant={selectedType === 'movie' ? 'secondary' : 'ghost'} onClick={() => handleTypeChange('movie')}>Movies</Button>
+                  <Button variant={selectedType === 'tv' ? 'secondary' : 'ghost'} onClick={() => handleTypeChange('tv')}>TV Shows</Button>
+              </div>
+              <div className="flex items-center gap-4">
+              <Select value={selectedGenre} onValueChange={handleGenreChange}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  <SelectItem value="all">All Genres</SelectItem>
+                  {genres.map((genre) => (
+                      <SelectItem key={genre} value={genre}>
+                      {genre}
+                      </SelectItem>
+                  ))}
+                  </SelectContent>
+              </Select>
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  <SelectItem value="rating-desc">Rating (High to Low)</SelectItem>
+                  <SelectItem value="rating-asc">Rating (Low to High)</SelectItem>
+                  <SelectItem value="year-desc">Year (Newest First)</SelectItem>
+                  <SelectItem value="year-asc">Year (Oldest First)</SelectItem>
+                  </SelectContent>
+              </Select>
+              </div>
+          </div>
+        </Card>
       </div>
       {filteredAndSortedMedia.length > 0 ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

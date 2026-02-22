@@ -77,7 +77,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2">
@@ -89,7 +89,7 @@ export function Header() {
           </nav>
         </div>
         
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex flex-1 items-center justify-end gap-4">
           <form onSubmit={handleSearch} className="relative hidden w-full max-w-xs sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input

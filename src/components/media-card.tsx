@@ -17,13 +17,13 @@ export function MediaCard({ media }: MediaCardProps) {
         alt={`Poster for ${media.title}`}
         fill
         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
-        className="h-full w-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
+        className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
         data-ai-hint="movie poster"
       />
       {media.reason && (
         <Badge className="absolute top-2 left-2 z-20" variant="destructive">AI Pick</Badge>
       )}
-      <div className="absolute inset-0 z-10 flex flex-col justify-end bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+      <div className="absolute inset-0 z-10 flex flex-col justify-end bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100">
         <div className="p-4 text-white">
           <h3 className="font-bold truncate">{media.title}</h3>
           <div className="text-xs text-gray-300 flex items-center gap-2 mt-1">
@@ -46,7 +46,7 @@ export function MediaCard({ media }: MediaCardProps) {
           </div>
         </div>
       </div>
-      <div className="absolute inset-0 bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
     </Link>
   );
 }
