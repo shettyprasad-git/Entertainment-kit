@@ -1,0 +1,265 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Stores information about a user within the Entertainment-Kit application. Excludes authentication credentials as they are managed by an external system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "username": {
+          "type": "string",
+          "description": "The user's chosen unique username."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for communication and potentially as a unique identifier. This is distinct from authentication email.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "The date and time when the user's profile was created.",
+          "format": "date-time"
+        },
+        "lastLoginDate": {
+          "type": "string",
+          "description": "The date and time of the user's last login.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email",
+        "registrationDate",
+        "lastLoginDate"
+      ]
+    },
+    "Content": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Content",
+      "type": "object",
+      "description": "Stores cached metadata for movies and TV shows that users interact with. This entity serves as a local reference/cache for external content from services like TMDB.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Content entity."
+        },
+        "tmdbId": {
+          "type": "string",
+          "description": "The unique identifier for the content from The Movie Database (TMDB)."
+        },
+        "contentType": {
+          "type": "string",
+          "description": "The type of content, e.g., 'movie' or 'tv_show'."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the movie or TV show."
+        },
+        "posterPath": {
+          "type": "string",
+          "description": "The relative URL path to the content's poster image on the external service (e.g., TMDB)."
+        },
+        "backdropPath": {
+          "type": "string",
+          "description": "The relative URL path to the content's backdrop image on the external service (e.g., TMDB)."
+        },
+        "releaseDate": {
+          "type": "string",
+          "description": "The release date for movies or the first air date for TV shows.",
+          "format": "date"
+        },
+        "overview": {
+          "type": "string",
+          "description": "A brief summary or description of the content."
+        },
+        "voteAverage": {
+          "type": "number",
+          "description": "The average user vote/rating for the content from the external service."
+        },
+        "genreIds": {
+          "type": "array",
+          "description": "An array of genre IDs associated with the content, as provided by the external service.",
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "tmdbId",
+        "contentType",
+        "title",
+        "posterPath",
+        "releaseDate",
+        "overview"
+      ]
+    },
+    "WatchlistItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WatchlistItem",
+      "type": "object",
+      "description": "Represents a single content item that a user has added to their personal watchlist.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WatchlistItem entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who owns this watchlist item. (Relationship: UserProfile 1:N WatchlistItem)"
+        },
+        "contentId": {
+          "type": "string",
+          "description": "Reference to the Content being saved in the watchlist. (Relationship: Content 1:N WatchlistItem)"
+        },
+        "addedDate": {
+          "type": "string",
+          "description": "The date and time when the content was added to the watchlist.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "contentId",
+        "addedDate"
+      ]
+    },
+    "ViewingHistory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ViewingHistory",
+      "type": "object",
+      "description": "Records a user's viewing activity for content, used for personalized recommendations and resuming playback.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ViewingHistory entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who viewed the content. (Relationship: UserProfile 1:N ViewingHistory)"
+        },
+        "contentId": {
+          "type": "string",
+          "description": "Reference to the Content that was viewed. (Relationship: Content 1:N ViewingHistory)"
+        },
+        "viewedAt": {
+          "type": "string",
+          "description": "The date and time when the content was viewed.",
+          "format": "date-time"
+        },
+        "progressSeconds": {
+          "type": "number",
+          "description": "The number of seconds into the content the user watched. Useful for resuming playback."
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Indicates whether the user completed watching the content."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "contentId",
+        "viewedAt",
+        "isCompleted"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/userProfiles/{userId}",
+        "definition": {
+          "entityName": "userProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores individual user profile information. Access is restricted to the owner (`request.auth.uid` must match `userId`).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, matching `request.auth.uid`."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/content/{contentId}",
+        "definition": {
+          "entityName": "content",
+          "schema": {
+            "$ref": "#/backend/entities/Content"
+          },
+          "description": "A globally accessible cache of movie and TV show metadata from TMDB. Publicly readable by all users.",
+          "params": [
+            {
+              "name": "contentId",
+              "description": "The unique identifier for the content item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/watchlists/{watchlistItemId}",
+        "definition": {
+          "entityName": "watchlistItem",
+          "schema": {
+            "$ref": "#/backend/entities/WatchlistItem"
+          },
+          "description": "User-specific watchlist items. Access is restricted to the owner (`request.auth.uid` must match `userId`). Includes denormalized 'userId' field for authorization independence and query flexibility.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns this watchlist item, matching `request.auth.uid`."
+            },
+            {
+              "name": "watchlistItemId",
+              "description": "The unique identifier for a specific watchlist item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/viewingHistory/{historyItemId}",
+        "definition": {
+          "entityName": "viewingHistory",
+          "schema": {
+            "$ref": "#/backend/entities/ViewingHistory"
+          },
+          "description": "User-specific viewing history records. Access is restricted to the owner (`request.auth.uid` must match `userId`). Includes denormalized 'userId' field for authorization independence and query flexibility.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns this viewing history item, matching `request.auth.uid`."
+            },
+            {
+              "name": "historyItemId",
+              "description": "The unique identifier for a specific viewing history entry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for the Entertainment-Kit application prioritizes security, scalability, and debuggability by adhering to the core design principles of Authorization Independence, Structural Segregation, and consistent Access Modeling. Each user's unique data is isolated under a dedicated path, and public data resides in a globally accessible collection.\n\nAuthorization Independence is achieved primarily through path-based ownership and strategic denormalization. For 'UserProfile' documents, the path `/userProfiles/{userId}` directly incorporates the user's unique identifier. Security rules can then simply verify `request.auth.uid == userId` without needing to perform `get()` operations on parent documents. For 'WatchlistItem' and 'ViewingHistory' entities, which are deeply tied to a specific user, they are structured as subcollections: `/userProfiles/{userId}/watchlists/{watchlistItemId}` and `/userProfiles/{userId}/viewingHistory/{historyItemId}`. In these subcollections, the `userId` is present in the document's fields (as per the schema) and also explicitly captured in the path wildcard. This dual presence (path and field) ensures that authorization rules like `allow read, write: if request.auth.uid == userId && resource.data.userId == userId;` are atomic and do not require fetching any parent document, thereby upholding Authorization Independence. The 'Content' collection is designed to be public and globally readable, thus having no authorization dependencies.\n\nQAPs (Queries Are Not Filters) are supported by ensuring that security rules validate the *intent* of the query based on the path structure, rather than trying to filter results after the fact. For user-specific data like 'WatchlistItem' and 'ViewingHistory', the hierarchical path (`/userProfiles/{userId}/...`) naturally restricts queries to an authenticated user's own data. A client attempting to list all watchlist items across all users would be denied, as the rules only grant access if `request.auth.uid` matches the `{userId}` in the path. This means a user can only 'list' items within their own designated subcollection. For the 'Content' collection, which holds public data, rules will explicitly allow broad read access. This structural design ensures that any `list` operation is secure by design, directly enforcing ownership or public access at the collection level based on the requesting user's identity and the requested path."
+  }
+}

@@ -1,0 +1,115 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model combined with a
+ * public data-caching model. All user-specific data (profiles, watchlists, viewing history)
+ * is isolated and accessible only by the authenticated owner. A separate, top-level
+ * collection for content metadata is publicly readable to all clients, but writes are
+ * restricted, assuming a trusted backend process manages this data cache.
+ *
+ * Data Structure: User data is hierarchically organized under `/userProfiles/{userId}`,
+ * ensuring a clear and secure separation of data between users. For example, a user's
+ * watchlist is stored at `/userProfiles/{userId}/watchlists/{watchlistItemId}`.
+ * Publicly shared data, such as movie/TV show metadata, resides in a separate top-level
+ * `/content` collection.
+ *
+ * Key Security Decisions:
+ * - User Enumeration Disabled: Listing the top-level `/userProfiles` collection is explicitly
+ *   denied to prevent attackers from harvesting user IDs.
+ * - Strict Ownership: All documents and subcollections under `/userProfiles/{userId}` can only
+ *   be accessed if the authenticated user's UID matches the `{userId}` in the path.
+ * - Public Cache: The `/content` collection is publicly readable by anyone, including
+ *   unauthenticated users, to support the application's browsing features. Client-side
+ *   writes to this collection are disabled as there is no ownership model defined for it.
+ * - Relational Integrity: On document creation, rules enforce that denormalized ownership
+ *   fields (e.g., `userId`) match the user's identity and the document's path. These fields
+ *   are then made immutable on update to maintain data consistency.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions to improve readability and maintainability.
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user is the owner of the resource.
+     * @param userId The UID of the user to check against.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the authenticated user is the owner and the document already exists.
+     * This is a critical check for all update and delete operations.
+     * @param userId The UID of the user to check against.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Secures user profile documents, allowing users to manage their own profile.
+     * @path /userProfiles/{userId}
+     * @allow A signed-in user ('user123') can (create), (get), or (update) their own document at /userProfiles/user123.
+     * @deny An authenticated user ('user456') is denied access to /userProfiles/user123. Unauthenticated users are denied all access. Listing the collection is denied to everyone to prevent user enumeration.
+     * @principle Restricts access to a user's own data tree and enforces self-creation of their root document.
+     */
+    match /userProfiles/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Secures a user's private watchlist items.
+       * @path /userProfiles/{userId}/watchlists/{watchlistItemId}
+       * @allow A user ('user123') can perform any read or write operation on documents within /userProfiles/user123/watchlists/.
+       * @deny A different user ('user456') cannot access any documents within /userProfiles/user123/watchlists/.
+       * @principle Enforces document ownership for a subcollection and validates relational integrity between the document and its path.
+       */
+      match /watchlists/{watchlistItemId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Secures a user's private viewing history records.
+       * @path /userProfiles/{userId}/viewingHistory/{historyItemId}
+       * @allow A user ('user123') can perform any read or write operation on documents within /userProfiles/user123/viewingHistory/.
+       * @deny A different user ('user456') cannot access any documents within /userProfiles/user123/viewingHistory/.
+       * @principle Enforces document ownership for a subcollection and validates relational integrity between the document and its path.
+       */
+      match /viewingHistory/{historyItemId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Provides public, read-only access to a global cache of content metadata.
+     * @path /content/{contentId}
+     * @allow Any user, signed-in or anonymous, can (get) or (list) documents from this collection.
+     * @deny No client is permitted to (create), (update), or (delete) content documents. These operations should be handled by a trusted backend service.
+     * @principle Implements a Public Read with Restricted Writes pattern. Writes are disabled because the data schema lacks an ownership field required for secure client-side mutations.
+     */
+    match /content/{contentId} {
+      allow get: if true;
+      allow list: if true;
+      // CRITICAL: Cannot implement owner-only writes. The 'Content' entity is missing an 'ownerId' or 'authorId' field.
+      allow create, update, delete: if false; // TODO: Add validation once an ownership field is added or confirm writes are server-side only.
+    }
+  }
+}
