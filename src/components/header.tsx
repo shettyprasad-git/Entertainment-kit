@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, User, Tv, Film, Home } from 'lucide-react';
+import { Search, User, Tv, Film, Home, LogOut } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useAuth, useUser } from '@/firebase';
 
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
@@ -24,6 +25,8 @@ const navLinks = [
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,6 +35,11 @@ export function Header() {
     if (query) {
       router.push(`/search?q=${encodeURIComponent(query)}`);
     }
+  };
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push('/login');
   };
 
   return (
@@ -65,23 +73,33 @@ export function Header() {
               aria-label="Search"
             />
           </form>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <User className="h-5 w-5" />
-                <span className="sr-only">User Menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Watchlist</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isUserLoading ? (
+            <div className="h-10 w-10" />
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">User Menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>{user.email || 'My Account'}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/profile')}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/watchlist')}>Watchlist</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" onClick={() => router.push('/login')}>
+              Login
+            </Button>
+          )}
         </div>
       </div>
     </header>
