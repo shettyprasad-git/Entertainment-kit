@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Entertainment-Kit',
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
         <FirebaseClientProvider>
           <div className="relative flex min-h-dvh flex-col">
-            <Header />
+            <Suspense>
+              <Header />
+            </Suspense>
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
