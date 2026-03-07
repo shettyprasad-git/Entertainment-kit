@@ -20,7 +20,7 @@ const requests = {
 
 // --- Helper Components ---
 
-const MovieRow = ({ title, fetchUrl, isLargeRow, onSelect }) => {
+const MovieRow = ({ title, fetchUrl, isLargeRow, onSelect, scrollId }) => {
   const [movies, setMovies] = useState([]);
   const rowRef = React.useRef(null);
 
@@ -46,7 +46,7 @@ const MovieRow = ({ title, fetchUrl, isLargeRow, onSelect }) => {
   };
 
   return (
-    <div className="ml-5 mb-10 group relative">
+    <div id={scrollId} className="ml-5 mb-10 group relative scroll-mt-24">
       <h2 className="text-white text-2xl font-bold mb-4">{title}</h2>
       
       <div className="relative flex items-center">
@@ -284,24 +284,36 @@ export default function Home() {
 
   const truncate = (str, n) => str?.length > n ? str.substr(0, n - 1) + "..." : str;
 
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="bg-[#141414] min-h-screen text-white font-sans selection:bg-red-600 overflow-x-hidden">
       
       {/* Navbar */}
       <nav className={`fixed top-0 w-full z-40 transition-all duration-700 flex items-center justify-between px-4 md:px-12 py-3 ${isScrolled ? 'bg-[#141414] shadow-xl' : 'bg-gradient-to-b from-black/70 to-transparent'}`}>
         <div className="flex items-center space-x-4 md:space-x-10">
-          <div className="flex items-center cursor-pointer hover:scale-105 transition-transform">
+          <div 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center cursor-pointer hover:scale-105 transition-transform"
+          >
             <Clapperboard className="text-red-600 mr-2 h-8 w-8 md:h-10 md:w-10" />
             <h1 className="text-red-600 text-2xl md:text-3xl font-black tracking-tighter hidden sm:block">
               ENTERTAINMENT KIT
             </h1>
           </div>
           <ul className="hidden lg:flex space-x-6 text-sm font-medium">
-            <li className="hover:text-gray-300 cursor-pointer transition">Home</li>
-            <li className="hover:text-gray-300 cursor-pointer transition">TV Shows</li>
-            <li className="hover:text-gray-300 cursor-pointer transition">Movies</li>
-            <li className="hover:text-gray-300 cursor-pointer transition">New & Popular</li>
-            <li className="hover:text-gray-300 cursor-pointer transition">My List</li>
+            <li onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-gray-300 cursor-pointer transition">Home</li>
+            <li onClick={() => scrollToSection('tv-shows')} className="hover:text-gray-300 cursor-pointer transition">TV Shows</li>
+            <li onClick={() => scrollToSection('movies')} className="hover:text-gray-300 cursor-pointer transition">Movies</li>
+            <li onClick={() => scrollToSection('new-popular')} className="hover:text-gray-300 cursor-pointer transition">New & Popular</li>
+            <li onClick={() => scrollToSection('my-list')} className="hover:text-gray-300 cursor-pointer transition">My List</li>
           </ul>
         </div>
         
@@ -381,18 +393,21 @@ export default function Home() {
       {/* Content Layers */}
       <div className="relative z-30 -mt-24 md:-mt-48 pb-12">
         <MovieRow 
+          scrollId="tv-shows"
           title="Netflix Originals" 
           fetchUrl={requests.originals} 
           isLargeRow 
           onSelect={setSelectedMovie} 
         />
         <MovieRow 
+          scrollId="new-popular"
           title="Trending Now" 
           fetchUrl={requests.trending} 
           onSelect={setSelectedMovie} 
         />
         <MovieRow 
-          title="Top Rated" 
+          scrollId="movies"
+          title="Top Rated Movies" 
           fetchUrl={requests.topRated} 
           onSelect={setSelectedMovie} 
         />
@@ -412,7 +427,8 @@ export default function Home() {
           onSelect={setSelectedMovie} 
         />
         <MovieRow 
-          title="Romance" 
+          scrollId="my-list"
+          title="Romance & Drama" 
           fetchUrl={requests.romance} 
           onSelect={setSelectedMovie} 
         />
