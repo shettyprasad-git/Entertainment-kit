@@ -59,7 +59,7 @@ const auth = (req, res, next) => {
 // Register Endpoint
 app.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
-    const username = email.split('@')[0];
+    let username = email.split('@')[0];
     const phone = req.body.phone || '';
 
     if (!name || !password || !email) {
@@ -74,6 +74,16 @@ app.post('/register', async (req, res) => {
 
         if (existingUsers.length > 0) {
             return res.status(409).json({ error: 'User with this email already exists' });
+        }
+
+        // Ensure username is unique to prevent ER_DUP_ENTRY MySQL crashes
+        const [existingUsernames] = await db.execute(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        );
+        
+        if (existingUsernames.length > 0) {
+            username = `${username}${Math.floor(Math.random() * 10000)}`;
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
