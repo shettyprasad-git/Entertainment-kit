@@ -50,31 +50,7 @@ export default function Home() {
     fetchInitialData();
   }, []);
 
-  // Search autocomplete hook
-  useEffect(() => {
-    if (searchQuery.trim().length > 2) {
-      fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(searchQuery)}`)
-        .then(res => res.json())
-        .then(data => {
-            const results = data.results.filter(m => m.backdrop_path || m.poster_path).slice(0, 5);
-            setSearchResults(results);
-        });
-    } else {
-      setSearchResults([]);
-    }
-  }, [searchQuery]);
 
-  // Handle clicking outside of search to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setIsSearchActive(false);
-        setSearchQuery('');
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // Rotate through the top 5 trending movies every 15 seconds
   useEffect(() => {
