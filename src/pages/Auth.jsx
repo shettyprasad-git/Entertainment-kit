@@ -4,6 +4,7 @@ import axios from 'axios';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -22,12 +23,10 @@ export default function Auth() {
 
     setLoading(true);
     const endpoint = isLogin ? '/login' : '/register';
+    const payload = isLogin ? { email, password } : { name, email, password };
     
     try {
-      const response = await axios.post(`https://entertainment-kit-backend.vercel.app${endpoint}`, {
-        email,
-        password,
-      });
+      const response = await axios.post(`https://entertainment-kit-backend.vercel.app${endpoint}`, payload);
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -94,6 +93,19 @@ export default function Auth() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <div className="animate-in slide-in-from-top-4 fade-in duration-300">
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required={!isLogin}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              />
+            </div>
+          )}
+
           <div>
             <input
               type="email"

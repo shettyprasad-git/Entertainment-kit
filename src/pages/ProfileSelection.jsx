@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import axios from 'axios';
 
 export default function ProfileSelection() {
   const navigate = useNavigate();
@@ -21,19 +22,28 @@ export default function ProfileSelection() {
       return;
     }
 
-    // Load custom profiles from local storage, or use default starter dummy profiles
-    const savedProfiles = localStorage.getItem('userProfiles');
-    if (savedProfiles) {
-      setProfiles(JSON.parse(savedProfiles));
-    } else {
-      const defaultProfiles = [
-        { id: 1, name: "Prasad", color: "bg-blue-600" },
-        { id: 2, name: "Kids", color: "bg-green-500" },
-        { id: 3, name: "Guest", color: "bg-yellow-500" }
-      ];
-      setProfiles(defaultProfiles);
-      localStorage.setItem('userProfiles', JSON.stringify(defaultProfiles));
-    }
+    // Load custom profiles from backend
+    const fetchProfiles = async () => {
+      try {
+        const response = await axios.get('https://entertainment-kit-backend.vercel.app/profiles', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (response.data && response.data.length > 0) {
+          setProfiles(response.data);
+        } else {
+          // Fallback if backend returned empty, though /register should create one
+          setProfiles([{ id: Date.now(), name: "Main", color: "bg-blue-600" }]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profiles", err);
+        // Fallback or error state
+        const fallback = [{ id: Date.now(), name: "Error Loading", color: "bg-red-600" }];
+        setProfiles(fallback);
+      }
+    };
+    
+    fetchProfiles();
   }, [navigate]);
 
   const selectProfile = (profile) => {
@@ -47,30 +57,53 @@ export default function ProfileSelection() {
     }
   };
 
-  const saveProfile = () => {
+  const saveProfile = async () => {
     if (!newProfileName.trim()) return;
     
-    let updated;
-    if (editingProfile.id === 'NEW') {
-      // Adding new profile
-      updated = [...profiles, { id: Date.now(), name: newProfileName, color: selectedColor }];
-    } else {
-      // Updating existing
-      updated = profiles.map(p => 
-        p.id === editingProfile.id ? { ...p, name: newProfileName, color: selectedColor } : p
-      );
-    }
+    const token = localStorage.getItem('token');
     
-    setProfiles(updated);
-    localStorage.setItem('userProfiles', JSON.stringify(updated));
-    setEditingProfile(null);
+    try {
+      let updatedProfiles = [...profiles];
+      
+      if (editingProfile.id === 'NEW') {
+        // Adding new profile to backend
+        const response = await axios.post('https://entertainment-kit-backend.vercel.app/profiles', 
+          { name: newProfileName, color: selectedColor },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        updatedProfiles.push(response.data);
+      } else {
+        // Updating existing profile in backend
+        const response = await axios.put(`https://entertainment-kit-backend.vercel.app/profiles/${editingProfile.id}`, 
+          { name: newProfileName, color: selectedColor },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        updatedProfiles = updatedProfiles.map(p => 
+          p.id === editingProfile.id ? response.data : p
+        );
+      }
+      
+      setProfiles(updatedProfiles);
+      setEditingProfile(null);
+    } catch (err) {
+      console.error("Failed to save profile", err);
+      alert("Error saving profile. Please try again.");
+    }
   };
 
-  const deleteProfile = (id) => {
-    const updated = profiles.filter(p => p.id !== id);
-    setProfiles(updated);
-    localStorage.setItem('userProfiles', JSON.stringify(updated));
-    setEditingProfile(null);
+  const deleteProfile = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      await axios.delete(`https://entertainment-kit-backend.vercel.app/profiles/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const updated = profiles.filter(p => p.id !== id);
+      setProfiles(updated);
+      setEditingProfile(null);
+    } catch (err) {
+      console.error("Failed to delete profile", err);
+      alert("Error deleting profile.");
+    }
   };
 
   const startAddProfile = () => {
