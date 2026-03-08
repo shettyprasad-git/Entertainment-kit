@@ -1,7 +1,5 @@
 # Entertainment Kit 🎬
 
-![Entertainment Kit Banner](https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2000&auto=format&fit=crop)
-
 A sleek, premium, and fully-responsive entertainment platform clone that allows users to discover, browse, and manage their favorite Movies and TV Shows. Featuring a gorgeous "Glassmorphism" UI, dynamic cinematic backgrounds, secure authentication, and a scalable backend architecture.
 
 **Live Demo:** [https://entertainment-kit.vercel.app](https://entertainment-kit.vercel.app)
