@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Clapperboard } from 'lucide-react';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -55,6 +56,14 @@ export default function Auth() {
       <div className="absolute inset-0 bg-black/50"></div>
       <div className="absolute inset-0 bg-gradient-to-tr from-[#ff4500]/20 to-transparent mix-blend-overlay"></div>
       
+      {/* Website Logo & Name */}
+      <div className="absolute top-6 left-6 md:top-10 md:left-12 z-20 flex items-center select-none">
+        <Clapperboard className="text-red-600 mr-2 h-8 w-8 md:h-10 md:w-10 drop-shadow-lg" />
+        <h1 className="text-red-600 text-2xl md:text-3xl font-black tracking-tighter drop-shadow-lg">
+          ENTERTAINMENT KIT
+        </h1>
+      </div>
+
       {/* Central Glassmorphism Card */}
       <div className="relative z-10 w-full max-w-md mx-4 p-10 bg-white/20 backdrop-blur-xl border border-white/30 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.15)] animate-in fade-in zoom-in-95 duration-700">
         
